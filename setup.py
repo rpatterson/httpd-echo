@@ -5,10 +5,20 @@ version = '0.1'
 
 setup(name='httpd-echo',
       version=version,
-      description="Simple Python HTTP server that echos the request in the response",
+      description="A Simple Python HTTP server that echos the request in the response",
       long_description="""\
 TODO""",
-      classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
+      classifiers=[
+          'Development Status :: 3 - Alpha',
+          'Environment :: Console',
+          'Intended Audience :: Developers',
+          'License :: OSI Approved :: GNU General Public License (GPL)',
+          'Natural Language :: English',
+          'Operating System :: OS Independent',
+          'Programming Language :: Python',
+          'Topic :: Internet :: WWW/HTTP :: HTTP Servers',
+          'Topic :: Utilities',
+      ],
       keywords='httpd http echo server',
       author='Ross Patterson',
       author_email='me@rpatterson.net',
