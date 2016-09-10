@@ -3,13 +3,15 @@ import os
 
 version = '0.1'
 
+test_requires = ['requests']
+
 setup(name='httpd-echo',
       version=version,
       description=(
           "A Simple Python HTTP server that echos the request in the response"
       ),
-      long_description="""\
-TODO""",
+      long_description=open(
+          os.path.join(os.path.dirname(__file__), 'README.rst')).read(),
       classifiers=[
           'Development Status :: 3 - Alpha',
           'Environment :: Console',
@@ -31,8 +33,10 @@ TODO""",
       zip_safe=False,
       install_requires=[
           # -*- Extra requirements: -*-
+          'six',
       ],
-      entry_points="""
-      # -*- Entry points: -*-
-      """,
+      tests_require=test_requires,
+      extras_require=dict(test=test_requires),
+      test_suite='tests',
+      entry_points=dict(console_scripts=['httpd-echo=httpdecho:main']),
       )
