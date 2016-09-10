@@ -3,6 +3,7 @@ A Simple Python HTTP server that echos the request in the response.
 """
 
 import socket
+import argparse
 from six.moves.urllib import parse
 import email.message
 try:
@@ -12,6 +13,16 @@ except ImportError:
     from email.generator import Generator as BytesGenerator
 
 from six.moves import BaseHTTPServer
+
+parser = argparse.ArgumentParser(
+    description=__doc__,
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument(
+    '--address', '-a', default='localhost',
+    help='hostname or IP address to accept requests on')
+parser.add_argument(
+    '--port', '-p', default='use the first available port after 8000',
+    help='port to accept requests on')
 
 
 class EchoHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -70,27 +81,31 @@ class EchoHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         return message
 
 
-def main(args=None):
+def main(args=None, default_port=8000):
     """
     Run the echo HTTP server.
     """
-    server_name = 'localhost'
-    server_port = 8000
+    args = parser.parse_args(args)
 
-    bound = False
-    while not bound:
-        try:
-            httpd = BaseHTTPServer.HTTPServer(
-                (server_name, server_port), EchoHTTPRequestHandler)
-        except socket.error:
-            server_port += 1
-            if server_port > 65535:
-                raise ValueError('No available port found')
-        else:
-            bound = True
+    port = args.port
+    if port == parser.get_default('port'):
+        port = default_port
+        bound = False
+        while not bound:
+            try:
+                httpd = BaseHTTPServer.HTTPServer(
+                    (args.address, port), EchoHTTPRequestHandler)
+            except socket.error:
+                port += 1
+                if port > 65535:
+                    raise ValueError('No available port found')
+            else:
+                bound = True
+    else:
+        httpd = BaseHTTPServer.HTTPServer(
+            (args.address, port), EchoHTTPRequestHandler)
 
-    print('Echoing HTTP at http://{0}:{1} ...'.format(
-        server_name, server_port))
+    print('Echoing HTTP at http://{0}:{1} ...'.format(args.address, port))
     httpd.serve_forever()
 
 
