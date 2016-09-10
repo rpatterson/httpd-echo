@@ -1,11 +1,13 @@
 from setuptools import setup, find_packages
-import sys, os
+import os
 
 version = '0.1'
 
 setup(name='httpd-echo',
       version=version,
-      description="A Simple Python HTTP server that echos the request in the response",
+      description=(
+          "A Simple Python HTTP server that echos the request in the response"
+      ),
       long_description="""\
 TODO""",
       classifiers=[
