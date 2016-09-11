@@ -19,10 +19,10 @@ parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument(
     '--address', '-a', default='localhost',
-    help='hostname or IP address to accept requests on')
+    help='Hostname or IP address to accept requests on.')
 parser.add_argument(
-    '--port', '-p', default='use the first available port after 8000',
-    help='port to accept requests on')
+    '--port', '-p', help='Port to accept requests on.  '
+    'If not specified, use the first available port after 8000.')
 
 
 class EchoHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -88,7 +88,7 @@ def main(args=None, default_port=8000):
     args = parser.parse_args(args)
 
     port = args.port
-    if port == parser.get_default('port'):
+    if port is None:
         port = default_port
         bound = False
         while not bound:
@@ -103,7 +103,7 @@ def main(args=None, default_port=8000):
                 bound = True
     else:
         httpd = BaseHTTPServer.HTTPServer(
-            (args.address, port), EchoHTTPRequestHandler)
+            (args.address, int(port)), EchoHTTPRequestHandler)
 
     print('Echoing HTTP at http://{0}:{1} ...'.format(args.address, port))
     httpd.serve_forever()
