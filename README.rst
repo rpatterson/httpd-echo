@@ -68,3 +68,15 @@ request, the body or the responses body will contain the POST body::
 Shutdown the server::
 
   >>> echo_popen.kill()
+
+
+----------------------------
+TODO
+----------------------------
+Features for future releases
+____________________________
+
+``Content-Type`` and ``Accept`` support for content negotiation:
+
+  Return the response body in the format specified in the ``Accept`` header if
+  given, otherwise in the same ``Content-Type`` as the request.
