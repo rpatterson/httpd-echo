@@ -60,7 +60,7 @@ class EchoHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         Send all the basic, required headers.
         """
         self.send_response(200)
-        self.send_header("Content-Type", 'text/rfc822-headers')
+        self.send_header("Content-Type", 'text/rfc822-headers; charset=UTF-8')
         self.send_header("Last-Modified", self.date_time_string())
         self.end_headers()
 
