@@ -47,10 +47,15 @@ class EchoHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         Echo a request with a body.
         """
         message = self.get_message()
-        message.set_payload(self.rfile.read(
-            int(self.headers['Content-Length'])))
-        self.send_head()
-        BytesGenerator(self.wfile).flatten(message, unixfrom=False)
+        try:
+            length = int(self.headers['Content-Length'])
+        except (TypeError, ValueError) as exc:
+            message.set_payload("Invalid Content-Length: " + str(exc))
+        else:
+            message.set_payload(self.rfile.read(length))
+        finally:
+            self.send_head()
+            BytesGenerator(self.wfile).flatten(message, unixfrom=False)
 
     do_PUT = do_POST
     do_PATCH = do_POST
