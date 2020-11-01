@@ -3,7 +3,6 @@ A Simple Python HTTP server that echos the request in the response.
 """
 
 import socket
-import argparse
 from six.moves.urllib import parse
 import email.message
 try:
@@ -13,16 +12,6 @@ except ImportError:
     from email.generator import Generator as BytesGenerator
 
 from six.moves import BaseHTTPServer
-
-parser = argparse.ArgumentParser(
-    description=__doc__,
-    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument(
-    '--address', '-a', default='localhost',
-    help='Hostname or IP address to accept requests on.')
-parser.add_argument(
-    '--port', '-p', help='Port to accept requests on.  '
-    'If not specified, use the first available port after 8000.')
 
 
 class EchoHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -90,6 +79,17 @@ def main(args=None, default_port=8000):
     """
     Run the echo HTTP server.
     """
+    import argparse
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument(
+        '--address', '-a', default='localhost',
+        help='Hostname or IP address to accept requests on.')
+    parser.add_argument(
+        '--port', '-p', help='Port to accept requests on.  '
+        'If not specified, use the first available port after 8000.')
+
     args = parser.parse_args(args)
 
     port = args.port
