@@ -39,4 +39,4 @@ setup(name='httpd-echo',
       extras_require=dict(test=test_requires),
       test_suite='tests',
       entry_points=dict(console_scripts=['httpd-echo=httpdecho:main']),
-      )
+)
