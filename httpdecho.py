@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 """
 A Simple Python HTTP server that echos the request in the response.
 """
