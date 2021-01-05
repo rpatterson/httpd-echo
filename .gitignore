@@ -1,3 +1,9 @@
 /.eggs/
 /.tox/
 /dist/
+/httpd_echo.egg-info/
+/__pycache__/
+*.pyc
+*.pyo
+/.project
+/.pydevproject

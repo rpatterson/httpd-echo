@@ -1,9 +1,11 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 """
 A Simple Python HTTP server that echos the request in the response.
 """
 
 import socket
-import argparse
 from six.moves.urllib import parse
 import email.message
 try:
@@ -13,16 +15,6 @@ except ImportError:
     from email.generator import Generator as BytesGenerator
 
 from six.moves import BaseHTTPServer
-
-parser = argparse.ArgumentParser(
-    description=__doc__,
-    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument(
-    '--address', '-a', default='localhost',
-    help='Hostname or IP address to accept requests on.')
-parser.add_argument(
-    '--port', '-p', help='Port to accept requests on.  '
-    'If not specified, use the first available port after 8000.')
 
 
 class EchoHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -47,10 +39,15 @@ class EchoHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         Echo a request with a body.
         """
         message = self.get_message()
-        message.set_payload(self.rfile.read(
-            int(self.headers['Content-Length'])))
-        self.send_head()
-        BytesGenerator(self.wfile).flatten(message, unixfrom=False)
+        try:
+            length = int(self.headers['Content-Length'])
+        except (TypeError, ValueError) as exc:
+            message.set_payload("Invalid Content-Length: " + str(exc))
+        else:
+            message.set_payload(self.rfile.read(length))
+        finally:
+            self.send_head()
+            BytesGenerator(self.wfile).flatten(message, unixfrom=False)
 
     do_PUT = do_POST
     do_PATCH = do_POST
@@ -85,6 +82,17 @@ def main(args=None, default_port=8000):
     """
     Run the echo HTTP server.
     """
+    import argparse
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument(
+        '--address', '-a', default='localhost',
+        help='Hostname or IP address to accept requests on.')
+    parser.add_argument(
+        '--port', '-p', help='Port to accept requests on.  '
+        'If not specified, use the first available port after 8000.')
+
     args = parser.parse_args(args)
 
     port = args.port

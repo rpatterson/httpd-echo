@@ -1,7 +1,10 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from setuptools import setup, find_packages
 import os
 
-version = '0.1'
+version = '0.1.1'
 
 test_requires = ['requests']
 
@@ -30,6 +33,7 @@ setup(name='httpd-echo',
       license='GPL',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
       include_package_data=True,
+      py_modules=['httpdecho'],
       zip_safe=False,
       install_requires=[
           # -*- Extra requirements: -*-
@@ -39,4 +43,4 @@ setup(name='httpd-echo',
       extras_require=dict(test=test_requires),
       test_suite='tests',
       entry_points=dict(console_scripts=['httpd-echo=httpdecho:main']),
-      )
+)
