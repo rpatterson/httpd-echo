@@ -2,8 +2,11 @@
 /.tox/
 /dist/
 /httpd_echo.egg-info/
+/httpdecho.egg-info/
 /__pycache__/
 *.pyc
 *.pyo
 /.project
 /.pydevproject
+/.coverage
+/.settings

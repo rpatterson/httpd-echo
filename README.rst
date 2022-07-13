@@ -21,16 +21,17 @@ starting at 8000 to try and be as predictable as possible::
   >>> import sys
   >>> import time
   >>> import subprocess
-  >>> from six.moves import SimpleHTTPServer
   >>> startup_delay = 0.5
   >>> simple_popen = subprocess.Popen(
-  ...     [sys.executable, '-m', SimpleHTTPServer.__name__]
+  ...     [sys.executable, '-m', 'http.server']
   ...     ); time.sleep(1)
   >>> echo_popen = subprocess.Popen(
   ...     [sys.executable, '-m', 'httpdecho']
   ...     ); time.sleep(1)
   >>> echo_popen.poll()
   >>> simple_popen.kill()
+  >>> simple_popen.communicate()
+  (None, None)
 
 Once running, HTTP requests are echoed in the responses.  The default response
 body format is basically HTTP header format, from
@@ -68,6 +69,8 @@ request, the body or the responses body will contain the POST body::
 Shutdown the server::
 
   >>> echo_popen.kill()
+  >>> echo_popen.communicate()
+  (None, None)
 
 
 ----------------------------
