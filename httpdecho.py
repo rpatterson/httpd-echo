@@ -6,15 +6,17 @@ A Simple Python HTTP server that echos the request in the response.
 """
 
 import socket
-from six.moves.urllib import parse
 import email.message
+from six.moves.urllib import parse
 try:
     from email.generator import BytesGenerator
 except ImportError:
     # BBB Python 2 compatibility
     from email.generator import Generator as BytesGenerator
-
 from six.moves import BaseHTTPServer
+
+
+__all__ = ['EchoHTTPRequestHandler']
 
 
 class EchoHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -22,7 +24,7 @@ class EchoHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     A Simple Python HTTP server that echos the request in the response.
     """
 
-    def do_GET(self):
+    def do_GET(self):  # pylint: disable=invalid-name
         """
         Echo a request without a body.
         """
@@ -34,7 +36,7 @@ class EchoHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     do_OPTIONS = do_GET
     do_DELETE = do_GET
 
-    def do_POST(self):
+    def do_POST(self):  # pylint: disable=invalid-name
         """
         Echo a request with a body.
         """
@@ -82,7 +84,7 @@ def main(args=None, default_port=8000):
     """
     Run the echo HTTP server.
     """
-    import argparse
+    import argparse  # pylint: disable=import-outside-toplevel
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -106,7 +108,8 @@ def main(args=None, default_port=8000):
             except socket.error:
                 port += 1
                 if port > 65535:
-                    raise ValueError('No available port found')
+                    # Silence pylint to keep it python2 compatible.
+                    raise ValueError('No available port found')  # pylint: disable=raise-missing-from
             else:
                 bound = True
     else:
