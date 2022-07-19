@@ -1,2 +1,3 @@
 include tox.ini
 include pytest.ini
+include Makefile
