@@ -1,6 +1,6 @@
-==========
 httpd-echo
 ==========
+
 A Simple Python HTTP server that echos the request in the response
 ------------------------------------------------------------------
 
@@ -73,13 +73,27 @@ Shutdown the server::
   (None, None)
 
 
-----------------------------
+----
 TODO
-----------------------------
+----
+
+
 Features for future releases
 ____________________________
 
-``Content-Type`` and ``Accept`` support for content negotiation:
+- ``Content-Type`` and ``Accept`` support for content negotiation:
 
   Return the response body in the format specified in the ``Accept`` header if
   given, otherwise in the same ``Content-Type`` as the request.
+
+- ``HTTP 2/0`` and further support.
+
+Tests
+_____
+
+- Use pytest and coverage to test every single line.
+
+Pypi
+----
+
+- Upload, what else? ;-)
