@@ -1,3 +1,14 @@
+/.coverage
 /.eggs/
+/.mypy_cache/
+/.project
+/.pydevproject
+/.settings
 /.tox/
+/build/
 /dist/
+/*.egg-info/
+/__pycache__/
+*.pyc
+*.pyd
+*.pyo

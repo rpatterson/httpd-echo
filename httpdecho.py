@@ -1,113 +1,113 @@
-"""
-A Simple Python HTTP server that echos the request in the response.
-"""
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
 
-import socket
+"""A Simple Python HTTP server that echos the request in the response."""
+
 import argparse
-from six.moves.urllib import parse
 import email.message
-try:
-    from email.generator import BytesGenerator
-except ImportError:
-    # BBB Python 2 compatibility
-    from email.generator import Generator as BytesGenerator
+import socket
+from email.generator import BytesGenerator
+from http.cookies import SimpleCookie
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib import parse
 
-from six.moves import BaseHTTPServer
+__version__ = '0.3.1'
 
-parser = argparse.ArgumentParser(
-    description=__doc__,
-    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument(
-    '--address', '-a', default='localhost',
-    help='Hostname or IP address to accept requests on.')
-parser.add_argument(
-    '--port', '-p', help='Port to accept requests on.  '
-    'If not specified, use the first available port after 8000.')
+__all__ = ["EchoHTTPRequestHandler"]
 
 
-class EchoHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
-    """
-    A Simple Python HTTP server that echos the request in the response.
-    """
+class EchoHTTPRequestHandler(BaseHTTPRequestHandler):
+    """A Simple Python HTTP server that echos the request in the response."""
 
-    def do_GET(self):
-        """
-        Echo a request without a body.
-        """
+    def do_GET(self):  # noqa:N802, pylint: disable=invalid-name
+        """Echo a request without a body."""
         message = self.get_message()
         self.send_head()
         BytesGenerator(self.wfile).flatten(message, unixfrom=False)
 
-    do_HEAD = do_GET
-    do_OPTIONS = do_GET
-    do_DELETE = do_GET
+    do_HEAD = do_GET  # noqa:N815
 
-    def do_POST(self):
-        """
-        Echo a request with a body.
-        """
+    do_OPTIONS = do_GET  # noqa:N815
+
+    do_DELETE = do_GET  # noqa:N815
+
+    def do_POST(self):  # noqa:N802, pylint: disable=invalid-name
+        """Echo a request with a body."""
         message = self.get_message()
-        message.set_payload(self.rfile.read(
-            int(self.headers['Content-Length'])))
-        self.send_head()
-        BytesGenerator(self.wfile).flatten(message, unixfrom=False)
+        try:
+            length = int(self.headers["Content-Length"])
+        except (TypeError, ValueError) as exc:
+            message.set_payload(f"Invalid Content-Length: {exc}")
+        else:
+            message.set_payload(self.rfile.read(length))
+        finally:
+            self.send_head()
+            BytesGenerator(self.wfile).flatten(message, unixfrom=False)
 
-    do_PUT = do_POST
-    do_PATCH = do_POST
+    do_PUT = do_POST  # noqa:N815
+
+    do_PATCH = do_POST  # noqa:N815
 
     def send_head(self):
-        """
-        Send all the basic, required headers.
-        """
+        """Send all the basic, required headers."""
         self.send_response(200)
-        self.send_header("Content-Type", 'text/rfc822-headers; charset=UTF-8')
+        # self.send_header("Content-Type", "text/rfc822-headers; charset=UTF-8")
+        self.send_header("Content-Type", "text/plain; charset=UTF-8")
         self.send_header("Last-Modified", self.date_time_string())
         self.end_headers()
 
     def get_message(self):
-        """
-        Assemble the basic message including query parameters.
-        """
+        """Assemble the basic message including query parameters."""
         message = email.message.Message()
-        message['Method'] = self.command
-        message['Path'] = self.path
+        message["Method"] = self.command
+        message["Path"] = self.path
 
-        server_url = parse.SplitResult('http', '{0}:{1}'.format(
-            self.server.server_name, self.server.server_port), '', '', '')
+        server_url = parse.SplitResult(scheme="http", netloc=f"{self.server.server_name}:{self.server.server_port}",
+                                       path="", query="", fragment="")
         request_url = parse.urlsplit(server_url.geturl() + self.path)
-        for header, value in parse.parse_qs(request_url.query).items():
-            message.add_header(header, value[0])
+        for name, value in parse.parse_qs(request_url.query).items():
+            message.add_header(name, value[0])
+
+        cookies = SimpleCookie(self.headers.get('Cookie'))
+        for name, value in cookies.items():
+            message.add_header(f'Cookie-{name}', repr(value))
 
         return message
 
 
 def main(args=None, default_port=8000):
-    """
-    Run the echo HTTP server.
-    """
+    """Run the echo HTTP server."""
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument(
+        "--address", "-a", default="127.0.0.1",
+        help="Hostname or IP address to accept requests on.")
+    parser.add_argument(
+        "--port", "-p", type=int,
+        help="Port number to accept requests on. If not specified, use the first available port after 8000.")
+
     args = parser.parse_args(args)
 
-    port = args.port
-    if port is None:
-        port = default_port
+    if args.port is None:
+        args.port = default_port
         bound = False
         while not bound:
             try:
-                httpd = BaseHTTPServer.HTTPServer(
-                    (args.address, port), EchoHTTPRequestHandler)
-            except socket.error:
-                port += 1
-                if port > 65535:
-                    raise ValueError('No available port found')
+                httpd = HTTPServer((args.address, args.port), EchoHTTPRequestHandler)
+            except socket.error as exc:
+                args.port += 1
+                if args.port > 65535:
+                    raise ValueError("No available port found") from exc
             else:
                 bound = True
     else:
-        httpd = BaseHTTPServer.HTTPServer(
-            (args.address, int(port)), EchoHTTPRequestHandler)
+        httpd = HTTPServer((args.address, args.port), EchoHTTPRequestHandler)
 
-    print('Echoing HTTP at http://{0}:{1} ...'.format(args.address, port))
-    httpd.serve_forever()
+    print(f"Echoing HTTP at http://{args.address}:{args.port}, press Ctrl+C to stop.")
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print(" - Stopped")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

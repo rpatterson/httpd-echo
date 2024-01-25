@@ -1,6 +1,6 @@
-==========
 httpd-echo
 ==========
+
 A Simple Python HTTP server that echos the request in the response
 ------------------------------------------------------------------
 
@@ -21,16 +21,17 @@ starting at 8000 to try and be as predictable as possible::
   >>> import sys
   >>> import time
   >>> import subprocess
-  >>> from six.moves import SimpleHTTPServer
   >>> startup_delay = 0.5
   >>> simple_popen = subprocess.Popen(
-  ...     [sys.executable, '-m', SimpleHTTPServer.__name__]
+  ...     [sys.executable, '-m', 'http.server']
   ...     ); time.sleep(1)
   >>> echo_popen = subprocess.Popen(
   ...     [sys.executable, '-m', 'httpdecho']
   ...     ); time.sleep(1)
   >>> echo_popen.poll()
   >>> simple_popen.kill()
+  >>> simple_popen.communicate()
+  (None, None)
 
 Once running, HTTP requests are echoed in the responses.  The default response
 body format is basically HTTP header format, from
@@ -68,15 +69,31 @@ request, the body or the responses body will contain the POST body::
 Shutdown the server::
 
   >>> echo_popen.kill()
+  >>> echo_popen.communicate()
+  (None, None)
 
 
-----------------------------
+----
 TODO
-----------------------------
+----
+
+
 Features for future releases
 ____________________________
 
-``Content-Type`` and ``Accept`` support for content negotiation:
+- ``Content-Type`` and ``Accept`` support for content negotiation:
 
   Return the response body in the format specified in the ``Accept`` header if
   given, otherwise in the same ``Content-Type`` as the request.
+
+- ``HTTP 2/0`` and further support.
+
+Tests
+_____
+
+- Use pytest and coverage to test every single line.
+
+Pypi
+----
+
+- Upload, what else? ;-)
