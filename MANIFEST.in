@@ -1,3 +1,9 @@
 include tox.ini
 include pytest.ini
 include Makefile
+include .idea/httpd-echo.iml
+include .idea/inspectionProfiles/Project_Default.xml
+include .idea/inspectionProfiles/profiles_settings.xml
+include .idea/misc.xml
+include .idea/modules.xml
+include .idea/vcs.xml
