@@ -62,7 +62,8 @@ class EchoHTTPRequestHandler(BaseHTTPRequestHandler):
         message["Method"] = self.command
         message["Path"] = self.path
 
-        server_url = parse.SplitResult("http", f"{self.server.server_name}:{self.server.server_port}", "", "", "")
+        server_url = parse.SplitResult(scheme="http", netloc=f"{self.server.server_name}:{self.server.server_port}",
+                                       path="", query="", fragment="")
         request_url = parse.urlsplit(server_url.geturl() + self.path)
         for name, value in parse.parse_qs(request_url.query).items():
             message.add_header(name, value[0])
