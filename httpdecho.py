@@ -4,14 +4,14 @@
 """A Simple Python HTTP server that echos the request in the response."""
 
 import argparse
-from email.generator import BytesGenerator
 import email.message
-from http.server import BaseHTTPRequestHandler, HTTPServer
 import socket
+from email.generator import BytesGenerator
+from http.cookies import SimpleCookie
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib import parse
 
 __version__ = '0.3.0'
-
 
 __all__ = ["EchoHTTPRequestHandler"]
 
@@ -25,11 +25,11 @@ class EchoHTTPRequestHandler(BaseHTTPRequestHandler):
         self.send_head()
         BytesGenerator(self.wfile).flatten(message, unixfrom=False)
 
-    do_HEAD = do_GET     # noqa:N815
+    do_HEAD = do_GET  # noqa:N815
 
     do_OPTIONS = do_GET  # noqa:N815
 
-    do_DELETE = do_GET   # noqa:N815
+    do_DELETE = do_GET  # noqa:N815
 
     def do_POST(self):  # noqa:N802, pylint: disable=invalid-name
         """Echo a request with a body."""
@@ -44,14 +44,15 @@ class EchoHTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_head()
             BytesGenerator(self.wfile).flatten(message, unixfrom=False)
 
-    do_PUT = do_POST    # noqa:N815
+    do_PUT = do_POST  # noqa:N815
 
     do_PATCH = do_POST  # noqa:N815
 
     def send_head(self):
         """Send all the basic, required headers."""
         self.send_response(200)
-        self.send_header("Content-Type", "text/rfc822-headers; charset=UTF-8")
+        # self.send_header("Content-Type", "text/rfc822-headers; charset=UTF-8")
+        self.send_header("Content-Type", "text/plain; charset=UTF-8")
         self.send_header("Last-Modified", self.date_time_string())
         self.end_headers()
 
@@ -63,8 +64,12 @@ class EchoHTTPRequestHandler(BaseHTTPRequestHandler):
 
         server_url = parse.SplitResult("http", f"{self.server.server_name}:{self.server.server_port}", "", "", "")
         request_url = parse.urlsplit(server_url.geturl() + self.path)
-        for header, value in parse.parse_qs(request_url.query).items():
-            message.add_header(header, value[0])
+        for name, value in parse.parse_qs(request_url.query).items():
+            message.add_header(name, value[0])
+
+        cookies = SimpleCookie(self.headers.get('Cookie'))
+        for name, value in cookies.items():
+            message.add_header(f'Cookie-{name}', repr(value))
 
         return message
 
