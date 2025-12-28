@@ -1,3 +1,12 @@
+# Common backup files suffix:
+*~
+
+# Python byte-compiled files:
+*.py[co]
+__pycache__
+
+# Build artifacts:
 /.eggs/
 /.tox/
 /dist/
+/httpd_echo.egg-info
